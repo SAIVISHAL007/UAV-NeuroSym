@@ -1,0 +1,69 @@
+{
+  "scenario_id": "UAVBENCH-002",
+  "title": "Energy-Stressed Medical Delivery",
+  "description": "High-payload hexacopter delivering emergency vaccines with tight battery margin.",
+  "mission_type": "delivery",
+  "uav": {
+    "uav_id": "UAV-Hexa-02",
+    "uav_type": "rotorcraft",
+    "mass_kg": 6.5,
+    "battery_capacity_wh": 85.0,
+    "reserve_fraction": 0.2,
+    "max_velocity_ms": 16.0,
+    "max_tilt_deg": 35.0,
+    "hover_power_w": 280.0,
+    "drag_coeff_kd": 0.065,
+    "maneuver_coeff_km": 0.01,
+    "rotor_disk_area_m2": 0.35,
+    "wing_area_m2": null,
+    "stall_velocity_ms": null
+  },
+  "weather": {
+    "wind_speed_ms": 6.0,
+    "wind_direction_deg": 180.0,
+    "gust_amplitude_ms": 2.0,
+    "visibility_km": 10.0,
+    "icing_risk": false,
+    "gnss_jamming_power_dbm": -120.0
+  },
+  "airspace": {
+    "name": "Medical Express Corridor",
+    "vertices": [
+      [0.0, 0.0],
+      [1000.0, 0.0],
+      [1000.0, 1000.0],
+      [0.0, 1000.0]
+    ],
+    "min_alt_m": 15.0,
+    "max_alt_m": 120.0
+  },
+  "no_fly_zones": [],
+  "spawn_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 25.0
+  },
+  "waypoints": [
+    {
+      "x": 250.0,
+      "y": 100.0,
+      "z": 50.0
+    },
+    {
+      "x": 500.0,
+      "y": 250.0,
+      "z": 60.0
+    },
+    {
+      "x": 750.0,
+      "y": 500.0,
+      "z": 50.0
+    }
+  ],
+  "time_budget_s": 300.0,
+  "min_separation_m": 10.0,
+  "min_ttc_s": 3.0,
+  "faults": [],
+  "risk_level": 2,
+  "safety_tag": "Energy_Constrained"
+}

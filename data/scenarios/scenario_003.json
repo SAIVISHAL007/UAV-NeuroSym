@@ -1,0 +1,78 @@
+{
+  "scenario_id": "UAVBENCH-003",
+  "title": "VIP No-Fly Zone Rerouting",
+  "description": "Search and rescue mission encountering active temporary flight restriction (TFR) polygon.",
+  "mission_type": "search_and_rescue",
+  "uav": {
+    "uav_id": "UAV-Quad-03",
+    "uav_type": "rotorcraft",
+    "mass_kg": 3.2,
+    "battery_capacity_wh": 180.0,
+    "reserve_fraction": 0.2,
+    "max_velocity_ms": 18.0,
+    "max_tilt_deg": 35.0,
+    "hover_power_w": 180.0,
+    "drag_coeff_kd": 0.045,
+    "maneuver_coeff_km": 0.01,
+    "rotor_disk_area_m2": 0.35,
+    "wing_area_m2": null,
+    "stall_velocity_ms": null
+  },
+  "weather": {
+    "wind_speed_ms": 4.0,
+    "wind_direction_deg": 180.0,
+    "gust_amplitude_ms": 1.5,
+    "visibility_km": 10.0,
+    "icing_risk": false,
+    "gnss_jamming_power_dbm": -120.0
+  },
+  "airspace": {
+    "name": "Metro SAR Sector",
+    "vertices": [
+      [-100.0, -100.0],
+      [500.0, -100.0],
+      [500.0, 500.0],
+      [-100.0, 500.0]
+    ],
+    "min_alt_m": 10.0,
+    "max_alt_m": 120.0
+  },
+  "no_fly_zones": [
+    {
+      "nfz_id": "NFZ-VIP-99",
+      "name": "Government Facility TFR",
+      "polygon": [
+        [40.0, 20.0],
+        [160.0, 20.0],
+        [160.0, 120.0],
+        [40.0, 120.0]
+      ],
+      "min_alt_m": 0.0,
+      "max_alt_m": 150.0,
+      "is_active": true
+    }
+  ],
+  "spawn_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 20.0
+  },
+  "waypoints": [
+    {
+      "x": 100.0,
+      "y": 50.0,
+      "z": 35.0
+    },
+    {
+      "x": 200.0,
+      "y": 150.0,
+      "z": 40.0
+    }
+  ],
+  "time_budget_s": 350.0,
+  "min_separation_m": 10.0,
+  "min_ttc_s": 3.0,
+  "faults": [],
+  "risk_level": 2,
+  "safety_tag": "NFZ_Conflict"
+}

@@ -1,0 +1,64 @@
+{
+  "scenario_id": "UAVBENCH-005",
+  "title": "Hybrid Extreme Weather Flight",
+  "description": "Fixed-wing glider operating in severe wind gusting and atmospheric icing conditions.",
+  "mission_type": "inspection",
+  "uav": {
+    "uav_id": "UAV-Wing-05",
+    "uav_type": "fixed_wing",
+    "mass_kg": 4.5,
+    "battery_capacity_wh": 160.0,
+    "reserve_fraction": 0.2,
+    "max_velocity_ms": 25.0,
+    "max_tilt_deg": 35.0,
+    "hover_power_w": 180.0,
+    "drag_coeff_kd": 0.045,
+    "maneuver_coeff_km": 0.01,
+    "rotor_disk_area_m2": 0.35,
+    "wing_area_m2": 0.45,
+    "stall_velocity_ms": 12.5
+  },
+  "weather": {
+    "wind_speed_ms": 12.0,
+    "wind_direction_deg": 180.0,
+    "gust_amplitude_ms": 4.5,
+    "visibility_km": 4.0,
+    "icing_risk": true,
+    "gnss_jamming_power_dbm": -120.0
+  },
+  "airspace": {
+    "name": "Coastal Ridge Airspace",
+    "vertices": [
+      [-500.0, -500.0],
+      [1000.0, -500.0],
+      [1000.0, 1000.0],
+      [-500.0, 1000.0]
+    ],
+    "min_alt_m": 20.0,
+    "max_alt_m": 150.0
+  },
+  "no_fly_zones": [],
+  "spawn_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 40.0
+  },
+  "waypoints": [
+    {
+      "x": 300.0,
+      "y": 200.0,
+      "z": 60.0
+    },
+    {
+      "x": 600.0,
+      "y": 400.0,
+      "z": 70.0
+    }
+  ],
+  "time_budget_s": 450.0,
+  "min_separation_m": 10.0,
+  "min_ttc_s": 3.0,
+  "faults": [],
+  "risk_level": 2,
+  "safety_tag": "Weather_Aerodynamic_Stress"
+}

@@ -1,0 +1,74 @@
+{
+  "scenario_id": "UAVBENCH-001",
+  "title": "Nominal Urban Corridor Inspection",
+  "description": "Rotorcraft performing routine grid survey over urban industrial corridor.",
+  "mission_type": "inspection",
+  "uav": {
+    "uav_id": "UAV-Quad-01",
+    "uav_type": "rotorcraft",
+    "mass_kg": 2.8,
+    "battery_capacity_wh": 150.0,
+    "reserve_fraction": 0.2,
+    "max_velocity_ms": 15.0,
+    "max_tilt_deg": 35.0,
+    "hover_power_w": 140.0,
+    "drag_coeff_kd": 0.045,
+    "maneuver_coeff_km": 0.01,
+    "rotor_disk_area_m2": 0.35,
+    "wing_area_m2": null,
+    "stall_velocity_ms": null
+  },
+  "weather": {
+    "wind_speed_ms": 3.0,
+    "wind_direction_deg": 180.0,
+    "gust_amplitude_ms": 1.5,
+    "visibility_km": 12.0,
+    "icing_risk": false,
+    "gnss_jamming_power_dbm": -120.0
+  },
+  "airspace": {
+    "name": "Sector A Airspace",
+    "vertices": [
+      [-200.0, -200.0],
+      [300.0, -200.0],
+      [300.0, 300.0],
+      [-200.0, 300.0]
+    ],
+    "min_alt_m": 10.0,
+    "max_alt_m": 100.0
+  },
+  "no_fly_zones": [],
+  "spawn_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 20.0
+  },
+  "waypoints": [
+    {
+      "x": 50.0,
+      "y": 50.0,
+      "z": 30.0
+    },
+    {
+      "x": 150.0,
+      "y": 50.0,
+      "z": 40.0
+    },
+    {
+      "x": 150.0,
+      "y": 150.0,
+      "z": 40.0
+    },
+    {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 20.0
+    }
+  ],
+  "time_budget_s": 400.0,
+  "min_separation_m": 10.0,
+  "min_ttc_s": 3.0,
+  "faults": [],
+  "risk_level": 0,
+  "safety_tag": "Nominal"
+}

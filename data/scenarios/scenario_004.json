@@ -1,0 +1,71 @@
+{
+  "scenario_id": "UAVBENCH-004",
+  "title": "GNSS Denial & Sensor Fault",
+  "description": "Tactical recon UAV encountering localized GPS spoofing/jamming attack.",
+  "mission_type": "reconnaissance",
+  "uav": {
+    "uav_id": "UAV-Recon-04",
+    "uav_type": "rotorcraft",
+    "mass_kg": 4.0,
+    "battery_capacity_wh": 200.0,
+    "reserve_fraction": 0.2,
+    "max_velocity_ms": 20.0,
+    "max_tilt_deg": 35.0,
+    "hover_power_w": 180.0,
+    "drag_coeff_kd": 0.045,
+    "maneuver_coeff_km": 0.01,
+    "rotor_disk_area_m2": 0.35,
+    "wing_area_m2": null,
+    "stall_velocity_ms": null
+  },
+  "weather": {
+    "wind_speed_ms": 5.0,
+    "wind_direction_deg": 180.0,
+    "gust_amplitude_ms": 1.5,
+    "visibility_km": 10.0,
+    "icing_risk": false,
+    "gnss_jamming_power_dbm": -75.0
+  },
+  "airspace": {
+    "name": "Tactical Zone B",
+    "vertices": [
+      [-300.0, -300.0],
+      [600.0, -300.0],
+      [600.0, 600.0],
+      [-300.0, 600.0]
+    ],
+    "min_alt_m": 15.0,
+    "max_alt_m": 150.0
+  },
+  "no_fly_zones": [],
+  "spawn_point": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 30.0
+  },
+  "waypoints": [
+    {
+      "x": 150.0,
+      "y": 150.0,
+      "z": 50.0
+    },
+    {
+      "x": 300.0,
+      "y": 300.0,
+      "z": 50.0
+    }
+  ],
+  "time_budget_s": 300.0,
+  "min_separation_m": 10.0,
+  "min_ttc_s": 3.0,
+  "faults": [
+    {
+      "fault_type": "gnss_denial",
+      "start_time_s": 10.0,
+      "duration_s": 120.0,
+      "severity": 0.85
+    }
+  ],
+  "risk_level": 3,
+  "safety_tag": "Cyber_Physical_Attack"
+}
