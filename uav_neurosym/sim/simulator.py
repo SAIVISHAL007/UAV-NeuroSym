@@ -168,7 +168,11 @@ class VirtualUAVSimulator:
             "actual_position": self.actual_position.model_dump(),
             "estimated_position": self.current_telemetry.estimated_position.model_dump(),
             "remaining_battery_wh": round(self.remaining_battery_wh, 2),
-            "power_w": round(power_w, 2),
+            "power_draw_w": round(power_w, 2),
+            "ground_speed_ms": round(actual_speed, 2),
+            "heading_deg": round(heading_deg, 2),
+            "altitude_m": round(self.actual_position.z, 2),
+            "battery_percentage": round(self.remaining_battery_wh / max(self.scenario.uav.battery_capacity_wh, 0.01) * 100.0, 2),
             "is_valid": validation.is_valid,
             "violation": validation.violation_category
         })
