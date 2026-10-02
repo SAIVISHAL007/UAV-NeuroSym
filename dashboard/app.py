@@ -14,7 +14,6 @@ from uav_neurosym.mesh.specialized_agents import AgentRole
 
 st.set_page_config(
     page_title="NeuroSym — Ground Control Station",
-    page_icon="🛩️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -118,7 +117,7 @@ def main():
         <h1 style='background: linear-gradient(135deg, #00e676, #00bcd4, #7c4dff);
                    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                    font-size: 2.2rem; margin-bottom: 4px;'>
-            🛩️ NeuroSym — Ground Control Station
+            NeuroSym — Ground Control Station
         </h1>
         <p style='color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;'>
             Neuro-Symbolic Agentic Flight Decision System for Autonomous UAV Operations
@@ -136,28 +135,28 @@ def main():
     scenario_dict = {f"{s.scenario_id}: {s.title}": s for s in scenarios}
 
     # ─── Sidebar Controls ───
-    st.sidebar.markdown("### ⚙️ Control Panel")
-    selected_name = st.sidebar.selectbox("🎯 Flight Scenario", list(scenario_dict.keys()))
+    st.sidebar.markdown("### Control Panel")
+    selected_name = st.sidebar.selectbox("Flight Scenario", list(scenario_dict.keys()))
     scenario = scenario_dict[selected_name]
 
     st.sidebar.divider()
     llm_provider = st.sidebar.selectbox(
-        "🤖 LLM Provider Engine",
+        "LLM Provider Engine",
         ["mock", "groq", "gemini", "openai", "anthropic", "ollama", "huggingface"],
         index=0
     )
-    api_key_input = st.sidebar.text_input("🔑 API Key (Optional for Mock)", type="password")
-    max_retries = st.sidebar.slider("🔄 Max Reflection Retries", 1, 5, 3)
+    api_key_input = st.sidebar.text_input("API Key (Optional for Mock)", type="password")
+    max_retries = st.sidebar.slider("Max Reflection Retries", 1, 5, 3)
 
     st.sidebar.divider()
-    st.sidebar.markdown("#### 📊 Execution Mode")
+    st.sidebar.markdown("#### Execution Mode")
     run_mode = st.sidebar.radio(
         "Select Analysis Pipeline",
         ["Full Pipeline (All 6 Phases)", "Guardrail Only (Phase 1)", "Agent Mesh Only (Phase 6)"],
         index=0
     )
 
-    run_button = st.sidebar.button("🚀 Execute Autonomous Flight Plan", use_container_width=True, type="primary")
+    run_button = st.sidebar.button("Execute Autonomous Flight Plan", use_container_width=True, type="primary")
 
     # ─── Scenario Metadata Header ───
     st.divider()
@@ -172,7 +171,7 @@ def main():
     if run_button:
         client = LLMClient(provider=llm_provider, api_key=api_key_input if api_key_input else None)
 
-        with st.spinner("🛩️ Executing NeuroSym pipeline across all 6 phases..."):
+        with st.spinner("Executing NeuroSym pipeline across all 6 phases..."):
             progress = st.progress(0, text="Initializing...")
 
             # Phase 1: Baseline + Neuro-Symbolic Guardrail Agent
@@ -194,7 +193,7 @@ def main():
             closed_loop_agent = ClosedLoopAgent(client, dt_s=1.0, max_steps=500)
             cl_result = closed_loop_agent.run_mission(scenario)
 
-            progress.progress(100, text="✅ All 6 phases complete!")
+            progress.progress(100, text="All 6 phases complete!")
             time.sleep(0.5)
             progress.empty()
 
@@ -209,7 +208,7 @@ def main():
         st.session_state["executed"] = True
 
     if not st.session_state.get("executed"):
-        st.info("👆 Select a scenario and click **Execute Autonomous Flight Plan** to run all 6 phases.")
+        st.info("Select a scenario and click **Execute Autonomous Flight Plan** to run all 6 phases.")
         return
 
     # ─── Retrieve results from session state ───
@@ -226,11 +225,11 @@ def main():
     # TAB LAYOUT — One tab per major feature
     # ═════════════════════════════════════════════════════════════════════
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🗺️ Flight Map & Guardrails",
-        "🧠 Agent Mesh Intelligence",
-        "🔄 Closed-Loop Simulation",
-        "📊 Reflection Inspector",
-        "📋 Mission Report"
+        "Flight Map & Guardrails",
+        "Agent Mesh Intelligence",
+        "Closed-Loop Simulation",
+        "Reflection Inspector",
+        "Mission Report"
     ])
 
     # ═════════════════════════════════════════════════════════════════════
@@ -241,23 +240,23 @@ def main():
 
         res_col1, res_col2, res_col3 = st.columns(3)
         with res_col1:
-            st.markdown("##### 🔴 Unconstrained Baseline LLM")
+            st.markdown("##### Unconstrained Baseline LLM")
             if b_val and b_val.is_valid:
-                st.success("✅ CERTIFIED SAFE")
+                st.success("CERTIFIED SAFE")
             else:
-                st.error(f"❌ REJECTED: {b_val.violation_category if b_val else 'Failed'}")
+                st.error(f"REJECTED: {b_val.violation_category if b_val else 'Failed'}")
             st.caption(b_proposal.rationale if b_proposal else "")
 
         with res_col2:
-            st.markdown("##### 🟢 Neuro-Symbolic Agent (Ours)")
+            st.markdown("##### Neuro-Symbolic Agent (Ours)")
             if n_val and n_val.is_valid:
-                st.success(f"✅ CERTIFIED SAFE (Attempts: {len(n_history)})")
+                st.success(f"CERTIFIED SAFE (Attempts: {len(n_history)})")
             else:
-                st.error("❌ REJECTED (Max Retries Exceeded)")
+                st.error("REJECTED (Max Retries Exceeded)")
             st.caption(n_proposal.rationale if n_proposal else "")
 
         with res_col3:
-            st.markdown("##### 📐 Symbolic Telemetry")
+            st.markdown("##### Symbolic Telemetry")
             m = n_val.metrics if n_val else {}
             st.metric("Power Draw", f"{m.get('power_watts', 0):.1f} W")
             st.metric("Energy Consumed", f"{m.get('energy_consumed_wh', 0):.1f} Wh",
@@ -348,7 +347,7 @@ def main():
 
         # Advisory Flags Display
         if mesh_report["all_advisory_flags"]:
-            st.markdown("##### ⚠️ Advisory Flags Raised")
+            st.markdown("##### Advisory Flags Raised")
             flags_html = ""
             for f in mesh_report["all_advisory_flags"]:
                 css_class = "flag-chip flag-critical" if any(k in f for k in ["CRITICAL", "DENIED", "EMERGENCY"]) else "flag-chip"
@@ -358,15 +357,8 @@ def main():
         st.markdown("---")
 
         # Per-Agent Analysis Cards
-        st.markdown("##### 🤖 Specialized Agent Outputs")
+        st.markdown("##### Specialized Agent Outputs")
 
-        agent_icons = {
-            "perception_state": "👁️",
-            "mission_planner": "🎯",
-            "navigator": "🧭",
-            "risk_assessor": "⚠️",
-            "energy_reasoner": "🔋"
-        }
         agent_colors = {
             "perception_state": "#00bcd4",
             "mission_planner": "#ffd600",
@@ -376,7 +368,6 @@ def main():
         }
 
         for agent_name, summary in mesh_report["agent_summaries"].items():
-            icon = agent_icons.get(agent_name, "🤖")
             color = agent_colors.get(agent_name, "#7c4dff")
             conf_pct = summary["confidence"] * 100
 
@@ -384,7 +375,7 @@ def main():
             <div class='mesh-agent-card'>
                 <div style='display: flex; justify-content: space-between; align-items: center;'>
                     <span style='font-size: 1.05rem; font-weight: 600; color: {color};'>
-                        {icon} {agent_name.replace('_', ' ').title()}
+                        {agent_name.replace('_', ' ').title()}
                     </span>
                     <span style='color: {"#00e676" if conf_pct >= 80 else "#ff9100" if conf_pct >= 50 else "#ff5252"};
                            font-weight: 700; font-size: 0.95rem;'>
@@ -398,7 +389,7 @@ def main():
 
         # Mesh Proposal Summary
         st.markdown("---")
-        st.markdown("##### 🎯 Synthesized Mesh Consensus Proposal")
+        st.markdown("##### Synthesized Mesh Consensus Proposal")
         ps = mesh_report["proposal_summary"]
         pc1, pc2, pc3, pc4 = st.columns(4)
         pc1.metric("Waypoints", ps["num_waypoints"])
@@ -408,13 +399,12 @@ def main():
 
         # Mesh Execution Pipeline Visualization
         st.markdown("---")
-        st.markdown("##### 🔄 Mesh Execution Pipeline Log")
+        st.markdown("##### Mesh Execution Pipeline Log")
         for i, step in enumerate(mesh_report["execution_log"]):
-            icon = agent_icons.get(step["agent"], "🤖")
             color = agent_colors.get(step["agent"], "#7c4dff")
             st.markdown(f"""
             <div class='timeline-event' style='border-left-color: {color};'>
-                <strong style='color: {color};'>Step {i+1}: {icon} {step["agent"].replace('_', ' ').title()}</strong>
+                <strong style='color: {color};'>Step {i+1}: {step["agent"].replace('_', ' ').title()}</strong>
                 <span style='color: #667788; margin-left: 12px;'>Confidence: {step["confidence"]:.0%}</span>
                 <br><span style='color: #8899aa; font-size: 0.8rem;'>{step["rationale"]}</span>
             </div>
@@ -436,10 +426,10 @@ def main():
         # Mission Outcome Metrics
         o1, o2, o3, o4, o5 = st.columns(5)
         o1.metric("Mission Status",
-                  "✅ COMPLETED" if cl_result["is_completed"]
-                  else "⚠️ ABORTED" if cl_result["is_aborted"]
-                  else "❌ VIOLATED" if cl_result["is_violated"]
-                  else "⏳ TIMEOUT")
+                  "COMPLETED" if cl_result["is_completed"]
+                  else "ABORTED" if cl_result["is_aborted"]
+                  else "VIOLATED" if cl_result["is_violated"]
+                  else "TIMEOUT")
         o2.metric("Total Steps", cl_result["total_steps"])
         o3.metric("Elapsed Time", f"{cl_result['elapsed_time_s']:.1f} s")
         o4.metric("Final Battery", f"{cl_result['final_battery_pct']:.1f}%")
@@ -447,12 +437,12 @@ def main():
 
         # Strategies Used
         st.markdown("---")
-        st.markdown("##### 🧠 Adaptive Strategy Selection (Phase 5)")
+        st.markdown("##### Adaptive Strategy Selection (Phase 5)")
         strategy_tag_map = {
-            "lightweight_local_slm": ("strategy-tag strategy-slm", "🏠 Lightweight Local SLM"),
-            "strong_cloud_llm": ("strategy-tag strategy-llm", "☁️ Strong Cloud LLM"),
-            "deterministic_fallback": ("strategy-tag strategy-det", "🔒 Deterministic Fallback"),
-            "emergency_deterministic_controller": ("strategy-tag strategy-emg", "🚨 Emergency Controller"),
+            "lightweight_local_slm": ("strategy-tag strategy-slm", "Lightweight Local SLM"),
+            "strong_cloud_llm": ("strategy-tag strategy-llm", "Strong Cloud LLM"),
+            "deterministic_fallback": ("strategy-tag strategy-det", "Deterministic Fallback"),
+            "emergency_deterministic_controller": ("strategy-tag strategy-emg", "Emergency Controller"),
         }
         strat_html = ""
         for s in cl_result["strategies_used"]:
@@ -462,7 +452,7 @@ def main():
 
         # Telemetry Charts from step_history
         st.markdown("---")
-        st.markdown("##### 📈 Real-Time Telemetry Traces (Phase 2 Simulation Engine + Phase 4 Temporal Memory)")
+        st.markdown("##### Real-Time Telemetry Traces (Phase 2 Simulation Engine + Phase 4 Temporal Memory)")
 
         step_history = cl_result.get("step_history", [])
         if step_history:
@@ -485,7 +475,7 @@ def main():
                     fillcolor="rgba(0, 230, 118, 0.08)"
                 ))
                 fig_batt.update_layout(
-                    title="🔋 Battery Discharge Curve",
+                    title="Battery Discharge Curve",
                     template="plotly_dark",
                     height=300,
                     margin=dict(l=40, r=20, t=40, b=30),
@@ -505,7 +495,7 @@ def main():
                     fillcolor="rgba(83, 109, 254, 0.08)"
                 ))
                 fig_speed.update_layout(
-                    title="💨 Ground Speed Trace",
+                    title="Ground Speed Trace",
                     template="plotly_dark",
                     height=300,
                     margin=dict(l=40, r=20, t=40, b=30),
@@ -527,7 +517,7 @@ def main():
                     fillcolor="rgba(255, 145, 0, 0.08)"
                 ))
                 fig_power.update_layout(
-                    title="⚡ Power Consumption",
+                    title="Power Consumption",
                     template="plotly_dark",
                     height=300,
                     margin=dict(l=40, r=20, t=40, b=30),
@@ -547,7 +537,7 @@ def main():
                     fillcolor="rgba(224, 64, 251, 0.08)"
                 ))
                 fig_alt.update_layout(
-                    title="🏔️ Altitude Profile",
+                    title="Altitude Profile",
                     template="plotly_dark",
                     height=300,
                     margin=dict(l=40, r=20, t=40, b=30),
@@ -560,7 +550,7 @@ def main():
 
         # Timeline Events (Phase 3 Closed-Loop + Phase 4 Temporal Memory)
         st.markdown("---")
-        st.markdown("##### 📜 Chronological Event Timeline (Phase 3 Controller + Phase 4 Memory)")
+        st.markdown("##### Chronological Event Timeline (Phase 3 Controller + Phase 4 Memory)")
 
         timeline = cl_result.get("chronological_timeline", [])
         events = cl_result.get("events_logged", [])
@@ -570,7 +560,7 @@ def main():
                 st.markdown(f"<div class='timeline-event'>{evt}</div>", unsafe_allow_html=True)
         elif timeline:
             for entry in timeline[:20]:
-                st.markdown(f"<div class='timeline-event'>t={entry.get('timestamp_s', '?')}s — {entry.get('event', 'State recorded')}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='timeline-event'>t={entry.get('timestamp_s', '?')}s - {entry.get('event', 'State recorded')}</div>", unsafe_allow_html=True)
         else:
             st.info("No notable events recorded during simulation (nominal mission).")
 
@@ -588,13 +578,12 @@ def main():
                 prop = item["proposal"]
 
                 is_valid = val["is_valid"]
-                status_emoji = "✅" if is_valid else "❌"
                 status_label = "CERTIFIED SAFE" if is_valid else "GUARDRAIL REJECTED"
 
-                with st.expander(f"Reflection Step #{att} — {status_emoji} {status_label}", expanded=True):
+                with st.expander(f"Reflection Step #{att} — {status_label}", expanded=True):
                     col_a, col_b = st.columns([1, 1])
                     with col_a:
-                        st.markdown("**🤖 LLM Proposed Action:**")
+                        st.markdown("**LLM Proposed Action:**")
                         st.json({
                             "target_airspeed_ms": prop["target_airspeed_ms"],
                             "estimated_duration_s": prop["estimated_duration_s"],
@@ -603,7 +592,7 @@ def main():
                             "num_waypoints": len(prop.get("proposed_path", []))
                         })
                     with col_b:
-                        st.markdown("**🛡️ Symbolic Guardrail Verdict:**")
+                        st.markdown("**Symbolic Guardrail Verdict:**")
                         if is_valid:
                             st.success(val["diagnostic_message"])
                         else:
@@ -617,13 +606,13 @@ def main():
     # TAB 5: Full Mission Report
     # ═════════════════════════════════════════════════════════════════════
     with tab5:
-        st.markdown("##### 📋 Comprehensive Mission Execution Report")
+        st.markdown("##### Comprehensive Mission Execution Report")
 
         st.markdown("---")
         st.markdown("**Phase 1 — Guardrail Comparison:**")
         r1, r2 = st.columns(2)
-        r1.metric("Baseline Status", "✅ SAFE" if (b_val and b_val.is_valid) else "❌ REJECTED")
-        r2.metric("NeuroSym Status", "✅ SAFE" if (n_val and n_val.is_valid) else "❌ REJECTED")
+        r1.metric("Baseline Status", "SAFE" if (b_val and b_val.is_valid) else "REJECTED")
+        r2.metric("NeuroSym Status", "SAFE" if (n_val and n_val.is_valid) else "REJECTED")
 
         st.markdown("**Phase 2-5 — Closed-Loop Simulation:**")
         r3, r4, r5, r6 = st.columns(4)
@@ -640,12 +629,12 @@ def main():
         r10.metric("Critical Flags", mesh_report["critical_flag_count"])
 
         st.markdown("---")
-        st.markdown("**🔍 Raw Data Export:**")
-        with st.expander("📦 Full Closed-Loop Result JSON"):
+        st.markdown("**Raw Data Export:**")
+        with st.expander("Full Closed-Loop Result JSON"):
             export = {k: v for k, v in cl_result.items() if k != "step_history"}
             st.json(export)
 
-        with st.expander("📦 Full Mesh Report JSON"):
+        with st.expander("Full Mesh Report JSON"):
             st.json(mesh_report)
 
 
