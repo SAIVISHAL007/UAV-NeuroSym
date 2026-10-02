@@ -118,3 +118,63 @@ class GuardrailValidationResult(BaseModel):
     numerical_error: float = Field(0.0, description="Quantified deviation amount (e.g., Wh over limit, meters breached)")
     diagnostic_message: str = Field(..., description="Detailed diagnostic string to feed back into the agent reflection loop")
     metrics: Dict[str, Any] = Field(default_factory=dict, description="Calculated physical values (energy used Wh, reserve remaining Wh, distance m, etc.)")
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: Closed-Loop Simulation & Dynamic State Telemetry Models
+# ---------------------------------------------------------------------------
+
+class NetworkState(BaseModel):
+    connected: bool = Field(True, description="Whether network link is active")
+    latency_ms: float = Field(25.0, description="Simulated round-trip network latency (ms)")
+    bandwidth_mbps: float = Field(10.0, description="Simulated available bandwidth (Mbps)")
+    packet_loss_ratio: float = Field(0.01, description="Simulated packet loss fraction (0.0 to 1.0)")
+
+
+class GPSQuality(BaseModel):
+    is_jammed: bool = Field(False, description="True if GNSS jamming/denial is active")
+    satellite_count: int = Field(12, description="Number of tracked GPS satellites")
+    hdop: float = Field(1.1, description="Horizontal Dilution of Precision (lower is better)")
+    position_noise_m: float = Field(0.5, description="Position estimation error standard deviation (m)")
+
+
+class ObstacleObservation(BaseModel):
+    obstacle_id: str
+    position: Point3D
+    radius_m: float = Field(5.0, description="Bounding sphere radius (m)")
+    velocity_ms: Tuple[float, float, float] = Field((0.0, 0.0, 0.0), description="Estimated 3D velocity vector (vx, vy, vz)")
+    is_dynamic: bool = Field(False, description="Whether obstacle is moving")
+
+
+class SimulatedSensorStream(BaseModel):
+    timestamp_s: float = Field(0.0, description="Simulation step timestamp (seconds)")
+    estimated_position: Point3D = Field(..., description="GPS/Sensor fused position estimate (m)")
+    actual_position: Point3D = Field(..., description="True ground-truth 3D position (m)")
+    ground_speed_ms: float = Field(0.0, description="Current ground speed (m/s)")
+    heading_deg: float = Field(0.0, description="Compass heading angle (deg)")
+    remaining_battery_wh: float = Field(..., description="Current remaining battery energy (Wh)")
+    battery_percentage: float = Field(100.0, description="Remaining battery percentage (0-100%)")
+    power_draw_w: float = Field(0.0, description="Instantaneous power consumption rate (W)")
+    gps_quality: GPSQuality = Field(default_factory=GPSQuality)
+    network_state: NetworkState = Field(default_factory=NetworkState)
+    weather_state: Weather = Field(default_factory=Weather)
+    observed_obstacles: List[ObstacleObservation] = Field(default_factory=list)
+
+
+class StepAction(BaseModel):
+    target_waypoint: Point3D = Field(..., description="Target waypoint or waypoint waypoint for this step")
+    airspeed_ms: float = Field(10.0, description="Requested airspeed for this step (m/s)")
+    emergency_override: Optional[str] = Field(None, description="e.g., 'HOLD', 'RETURN_TO_BASE', 'LAND'")
+
+
+class SimulationState(BaseModel):
+    step_index: int = Field(0, description="Current discrete simulation step index k")
+    elapsed_time_s: float = Field(0.0, description="Total elapsed simulation time (s)")
+    dt_s: float = Field(1.0, description="Simulation step time delta (s)")
+    is_completed: bool = Field(False, description="True if mission reached target destination")
+    is_aborted: bool = Field(False, description="True if emergency abort was triggered")
+    is_violated: bool = Field(False, description="True if a hard safety constraint was breached")
+    current_telemetry: SimulatedSensorStream
+    active_faults: List[FaultInjection] = Field(default_factory=list)
+    step_history: List[Dict[str, Any]] = Field(default_factory=list)
+
