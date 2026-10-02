@@ -7,6 +7,7 @@ from uav_neurosym.agents.llm_client import LLMClient
 from uav_neurosym.sim.simulator import VirtualUAVSimulator
 from uav_neurosym.guardrails.validator import SymbolicGuardrailValidator
 from uav_neurosym.memory.temporal_memory import TemporalMemoryManager
+from uav_neurosym.adaptive.strategy_selector import AdaptiveStrategySelector, IntelligenceStrategy
 
 
 class ClosedLoopAgent:
@@ -15,7 +16,7 @@ class ClosedLoopAgent:
     Executes step-by-step interactive mission simulation (t0, t1, ..., tN):
     1. Observes SimulatedSensorStream telemetry per step.
     2. Records time-series state history in TemporalMemoryManager.
-    3. Queries temporal trends (battery discharge rate slope dE/dt, GPS noise trend).
+    3. Evaluates dynamic AI strategy selection using AdaptiveStrategySelector.
     4. Triggers dynamic mid-flight replanning or emergency fail-safe protocol (RETURN_TO_BASE).
     5. Passes step action proposal to symbolic guardrails before virtual UAV execution.
     """
@@ -27,6 +28,7 @@ class ClosedLoopAgent:
         self.seed = seed
         self.validator = SymbolicGuardrailValidator()
         self.memory = TemporalMemoryManager()
+        self.strategy_selector = AdaptiveStrategySelector()
 
     def run_mission(self, scenario: FlightScenario) -> Dict[str, Any]:
         """
@@ -40,6 +42,7 @@ class ClosedLoopAgent:
 
         replans_count = 0
         events_logged: List[str] = []
+        strategies_used: List[str] = []
         is_in_emergency_return = False
 
         state = simulator.get_state()
@@ -51,7 +54,14 @@ class ClosedLoopAgent:
             # Record step telemetry into Temporal Memory Manager
             self.memory.record_step(telemetry)
 
-            # 1. Perception & Temporal Trend Reasoning Phase
+            # 1. Evaluate Adaptive Strategy Selector
+            active_strategy, strategy_rationale = self.strategy_selector.select_strategy(
+                scenario, telemetry, self.memory
+            )
+            if active_strategy.value not in strategies_used:
+                strategies_used.append(active_strategy.value)
+
+            # 2. Perception & Strategy Execution Phase
             emergency_action = None
             requested_speed = min(scenario.uav.max_velocity_ms * 0.75, 12.0)
 
@@ -59,29 +69,24 @@ class ClosedLoopAgent:
             discharge_rate = self.memory.get_battery_discharge_rate_wh_per_sec(window_seconds=10.0)
             gps_noise_m, is_gps_degrading = self.memory.get_gps_noise_trend(window_seconds=10.0)
 
-            # Check 1: Severe GNSS Jamming & Degrading Trend Detection
-            is_gnss_jammed = telemetry.gps_quality.is_jammed or (scenario.weather.gnss_jamming_power_dbm > -90.0) or is_gps_degrading
-            if is_gnss_jammed:
+            # Apply Strategy Behavior
+            if active_strategy == IntelligenceStrategy.EMERGENCY_DETERMINISTIC_CONTROLLER:
                 emergency_action = "RETURN_TO_BASE"
                 if not is_in_emergency_return:
                     is_in_emergency_return = True
                     replans_count += 1
-                    evt_str = f"Step {state.step_index}: Detected severe GNSS jamming fault. Triggered emergency RETURN_TO_BASE."
+                    evt_str = f"Step {state.step_index}: [{active_strategy.value}] Severe GNSS jamming fault or critical risk event active. Triggered emergency RETURN_TO_BASE."
                     events_logged.append(evt_str)
                     self.memory.record_step(telemetry, event_text=evt_str)
 
-            # Check 2: Low Battery Reserve & Discharge Slope Monitoring
-            usable_wh = (1.0 - scenario.uav.reserve_fraction) * scenario.uav.battery_capacity_wh
-            consumed_wh = scenario.uav.battery_capacity_wh - telemetry.remaining_battery_wh
-            if (usable_wh - consumed_wh) < 15.0 and not is_in_emergency_return:
-                requested_speed = max(scenario.uav.max_velocity_ms * 0.45, 6.0)  # Economize energy
-                if "Battery margin low" not in str(events_logged):
-                    replans_count += 1
-                    evt_str = f"Step {state.step_index}: Battery margin low ({round(telemetry.remaining_battery_wh, 1)} Wh, slope={round(discharge_rate, 3)} Wh/s). Economized airspeed to {requested_speed} m/s."
+            elif active_strategy == IntelligenceStrategy.DETERMINISTIC_FALLBACK:
+                requested_speed = min(requested_speed, 8.0)
+                if "Deterministic fallback active" not in str(events_logged):
+                    evt_str = f"Step {state.step_index}: [{active_strategy.value}] Network degraded. Reduced speed for deterministic fallback."
                     events_logged.append(evt_str)
                     self.memory.record_step(telemetry, event_text=evt_str)
 
-            # Check 3: Waypoint Arrival Distance
+            # Check Waypoint Arrival Distance
             dist_to_wp = self._distance_3d(telemetry.actual_position, target_wp)
             if dist_to_wp < 3.0 and not is_in_emergency_return:
                 if current_wp_idx < len(waypoints) - 1:
@@ -91,14 +96,14 @@ class ClosedLoopAgent:
                     events_logged.append(evt_str)
                     self.memory.record_step(telemetry, event_text=evt_str)
 
-            # 2. Formulate Step Action
+            # 3. Formulate Step Action
             step_action = StepAction(
                 target_waypoint=target_wp,
                 airspeed_ms=requested_speed,
                 emergency_override=emergency_action
             )
 
-            # 3. Virtual UAV Simulator Execution Step
+            # 4. Virtual UAV Simulator Execution Step
             state = simulator.step(step_action)
 
         final_telemetry = state.current_telemetry
@@ -114,6 +119,7 @@ class ClosedLoopAgent:
             "final_battery_wh": final_telemetry.remaining_battery_wh,
             "final_battery_pct": final_telemetry.battery_percentage,
             "replans_count": replans_count,
+            "strategies_used": strategies_used,
             "events_logged": events_logged,
             "chronological_timeline": self.memory.get_chronological_events(),
             "step_history": state.step_history,
